@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Words Grid Generator</title>
+  <style>
+    /* Default grid layout styles */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 1px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Style for the words */
+    .grid-word {
+      border: 0px solid #000;
+      padding: 1px;
+      margin: 1px;
+      font-size: 1.2vw;
+      font-weight: bold;
+      background-color: transparent;
+      font-family: 'Gotham', Helvetica;
+    }
+    
+    /* Style for the wrapper element */
+    .grid-wrapper {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Style for the red grid container */
+    .grid-container-red {
+      position: absolute;
+      top: 100;
+      right: 0;
+      transform: rotate(90deg) translateY(-100%);
+      color: red;
+      height: 100vw; /* Set height to 100% of the viewport width */
+      width: 100vh;
+      transform-origin: top left; /* Set rotation origin to top right corner */
+      z-index: 3;
+      display: grid; /* Set default display to grid */
+    }
+
+    /* Style for the blue grid container */
+    .grid-container-blue {
+      color: blue;
+      background-color: white;
+      transform: rotate(0deg); /* Reset rotation for smaller screens */
+      height: 100%; /* Adjust height as needed */
+      width: 100%; /* Make it full width */
+      transform-origin: top left;
+      z-index: 2;
+      display: grid; /* Set default display to grid */
+    }
+    .disappear {
+      display: none;
+    }
+    .mask {
+      position: absolute;
+      border-radius: 50%;
+      background-color: transparent;
+      pointer-events: none;
+      width: 60px; /* Adjust the radius as needed (double the padding) */
+      height: 60px;
+      clip-path: circle(30px at center); /* Adjust the radius as needed */
+      transform: translate(-50%, -50%); /* Center the mask on the cursor */
+    }
+    .magnifying-glass {
+      position: absolute;
+      width: 100px; /* Adjust the size of the magnifying glass */
+      height: 100px;
+      border-radius: 50%;
+      border: 2px solid #fff; /* Magnifying glass border color */
+      background-size: 0% 300%; /* Magnifying glass background size for the transition effect */
+      background-position: center; /* Magnifying glass background position */
+      transition: background-size 0.2s ease-out; /* Transition effect for the magnifying glass */
+    }
+
+    /* Style for words within the magnifying glass */
+    .grid-word.magnified {
+      display: none;
+    }
+    .background-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 14vw; /* Adjust the font size as needed */
+      color: purple;
+      z-index: 1; /* Ensure the background is behind the grids */
+      transition: z-index 0.5s ease; /* Smooth transition for z-index */
+    }
+    @media screen and (max-width: 768px) {
+      .grid-container-red {
+        transform: rotate(0deg); /* Reset rotation for smaller screens */
+        height: 100%; /* Adjust height as needed */
+        width: 100%; /* Make it full width */
+        transform-origin: top left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-text">Humanity</div>
+
+  <script>
+    // Fetch the JSON file
+    function importWords(text) {
+      return fetch(text)
+        .then(response => response.json())
+        .then(wordsList => {
+          var randomWord = [];
+
+          for (var i = 0; i < 500; i++) {
+            var random = wordsList[Math.floor(Math.random() * wordsList.length)];
+            randomWord.push(random);
+          }
+
+          console.log("Random Word: ", randomWord);
+
+          return randomWord; // Return the array of random words
+        })
+        .catch(error => {
+          console.error('Error fetching wordsList.json:', error);
+          return []; // Return an empty array in case of an error
+        });
+    }
+
+    function createGrid(words, className) {
+      // Display words in a grid
+      const gridContainer = document.createElement("div");
+      gridContainer.classList.add('grid-container', className);
+
+      words.forEach(word => {
+        const wordElement = document.createElement("div");
+        wordElement.classList.add("grid-word");
+        wordElement.innerHTML = word;
+        gridContainer.appendChild(wordElement);
+      });
+
+      // Append gridContainer to the document
+      document.body.appendChild(gridContainer);
+    }
+
+    Promise.all([importWords('words_list_rep.json'), importWords('words_list_dem.json')])
+      .then(([rep, dem]) => {
+        // Create a wrapper element for the red grid container
+        const redWrapper = document.createElement("div");
+        redWrapper.classList.add('grid-wrapper');
+        document.body.appendChild(redWrapper);
+
+        createGrid(rep, 'grid-container-red');
+        createGrid(dem, 'grid-container-blue');
+      });
+
+    // Add event listener for mouseover and mouseout on the "Humanity" text
+    const backgroundText = document.querySelector('.background-text');
+    const redGrid = document.querySelector('.grid-container-red');
+    const blueGrid = document.querySelector('.grid-container-blue');
+
+    $(document).on('mouseover', function(event) {
+      // Change the z-index of "Humanity" during mouseover
+      backgroundText.style.zIndex = 4;
+    });
+
+    $(document).on('mouseout', function(event) {
+      // Set back the z-index of "Humanity" during mouseout
+      backgroundText.style.zIndex = 1;
+    });
+    </script>
+  
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Create the magnifying glass element
+      var magnifyingGlass = $('<div class="magnifying-glass"></div>');
+      $('body').append(magnifyingGlass);
+
+      // Add mousemove event listener
+      $(document).on('mousemove', function(event) {
+        // Get mouse coordinates
+        var mouseX = event.pageX;
+        var mouseY = event.pageY;
+
+        // Update the position of the magnifying glass
+        magnifyingGlass.css({
+          left: mouseX - magnifyingGlass.width() / 2,
+          top: mouseY - magnifyingGlass.height() / 2
+        });
+
+        // Hide words outside the magnifying glass
+        $('.grid-word').each(function () {
+          var elementX = $(this).offset().left + $(this).width() / 2;
+          var elementY = $(this).offset().top + $(this).height() / 2;
+          var distance = Math.sqrt(Math.pow(mouseX - elementX, 2) + Math.pow(mouseY - elementY, 2));
+
+          if (distance < magnifyingGlass.width() / 2) {
+            $(this).addClass('magnified');
+          } else {
+            $(this).removeClass('magnified');
+          }
+        });
+
+        // Update the magnifying glass background position for the transition effect
+        magnifyingGlass.css('background-position', (mouseX - magnifyingGlass.width() / 2) + 'px ' + (mouseY - magnifyingGlass.height() / 2) + 'px');
+      });
+    });
+  </script>
+</body>
+</html>
