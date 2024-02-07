@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Responsive Words Grid Generator</title>
+  <title>US Political Discourse</title>
   <style>
     /* Default grid layout styles */
     .grid-container {
@@ -61,19 +61,6 @@
       z-index: 2;
       display: grid; /* Set default display to grid */
     }
-    .disappear {
-      display: none;
-    }
-    .mask {
-      position: absolute;
-      border-radius: 50%;
-      background-color: transparent;
-      pointer-events: none;
-      width: 60px; /* Adjust the radius as needed (double the padding) */
-      height: 60px;
-      clip-path: circle(30px at center); /* Adjust the radius as needed */
-      transform: translate(-50%, -50%); /* Center the mask on the cursor */
-    }
     .magnifying-glass {
       position: absolute;
       width: 100px; /* Adjust the size of the magnifying glass */
@@ -90,14 +77,18 @@
       display: none;
     }
     .background-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 14vw; /* Adjust the font size as needed */
-      color: purple;
-      z-index: 1; /* Ensure the background is behind the grids */
-      transition: z-index 0.5s ease; /* Smooth transition for z-index */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14vw; /* Adjust the font size as needed */
+        color: purple;
+        transition: z-index 0.5s ease; /* Smooth transition for z-index */
+        font-family: 'Helvetica Neue','Roboto', 'Arial', sans-serif; /* Specify font family names separated by commas */
+        background: radial-gradient(ellipse at center, rgba(255, 255, 255, 1) 10%, rgba(255, 255, 255, 0) 60%); /* Use radial gradient to taper off the edges */
+        letter-spacing: 1px; /* Adjust letter spacing for better readability */
+        padding: 40vw; /* Add padding for better visual */
+        z-index: 1;
     }
     @media screen and (max-width: 768px) {
       .grid-container-red {
@@ -134,7 +125,7 @@
           return []; // Return an empty array in case of an error
         });
     }
-
+    
     function createGrid(words, className) {
       // Display words in a grid
       const gridContainer = document.createElement("div");
@@ -161,59 +152,66 @@
         createGrid(rep, 'grid-container-red');
         createGrid(dem, 'grid-container-blue');
       });
+    </script>
+  
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
-    // Add event listener for mouseover and mouseout on the "Humanity" text
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    function handleMouseMove(event) {
+    // Get the current mouse position
+    const mouseX = event.clientX;
+    const mouseY = event.clientY;}
+
     const backgroundText = document.querySelector('.background-text');
     const redGrid = document.querySelector('.grid-container-red');
     const blueGrid = document.querySelector('.grid-container-blue');
 
-    $(document).on('mouseover', function(event) {
-      // Change the z-index of "Humanity" during mouseover
-      backgroundText.style.zIndex = 4;
+    $(document).on('click', function(event) {
+        // Toggle z-index value between 1 and 5
+        // Stop mouseover motion on click
+        if (parseInt(backgroundText.style.zIndex) === 1) {
+            backgroundText.style.zIndex = 5;
+        } else {
+            // Re-enable mouseover motion
+            backgroundText.style.zIndex = 1;
+        }
     });
 
-    $(document).on('mouseout', function(event) {
-      // Set back the z-index of "Humanity" during mouseout
-      backgroundText.style.zIndex = 1;
-    });
-    </script>
-  
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <script>
-    $(document).ready(function () {
-      // Create the magnifying glass element
-      var magnifyingGlass = $('<div class="magnifying-glass"></div>');
-      $('body').append(magnifyingGlass);
+        $(document).ready(function activate() {
+        // Create the magnifying glass element
+        var magnifyingGlass = $('<div class="magnifying-glass"></div>');
+        $('body').append(magnifyingGlass);
 
-      // Add mousemove event listener
-      $(document).on('mousemove', function(event) {
-        // Get mouse coordinates
-        var mouseX = event.pageX;
-        var mouseY = event.pageY;
+        // Add mousemove event listener
+        $(document).on('mousemove', function activate(event) {
+            // Get mouse coordinates
+            var mouseX = event.pageX;
+            var mouseY = event.pageY;
 
-        // Update the position of the magnifying glass
-        magnifyingGlass.css({
-          left: mouseX - magnifyingGlass.width() / 2,
-          top: mouseY - magnifyingGlass.height() / 2
+            // Update the position of the magnifying glass
+            magnifyingGlass.css({
+            left: mouseX - magnifyingGlass.width() / 2,
+            top: mouseY - magnifyingGlass.height() / 2
+            });
+
+            // Hide words outside the magnifying glass
+            $('.grid-word').each(function () {
+            var elementX = $(this).offset().left + $(this).width() / 2;
+            var elementY = $(this).offset().top + $(this).height() / 2;
+            var distance = Math.sqrt(Math.pow(mouseX - elementX, 2) + Math.pow(mouseY - elementY, 2));
+
+            if (distance < magnifyingGlass.width() / 2) {
+                $(this).addClass('magnified');
+            } else {
+                $(this).removeClass('magnified');
+            }
+            });
+
+            // Update the magnifying glass background position for the transition effect
+            magnifyingGlass.css('background-position', (mouseX - magnifyingGlass.width() / 2) + 'px ' + (mouseY - magnifyingGlass.height() / 2) + 'px');
         });
-
-        // Hide words outside the magnifying glass
-        $('.grid-word').each(function () {
-          var elementX = $(this).offset().left + $(this).width() / 2;
-          var elementY = $(this).offset().top + $(this).height() / 2;
-          var distance = Math.sqrt(Math.pow(mouseX - elementX, 2) + Math.pow(mouseY - elementY, 2));
-
-          if (distance < magnifyingGlass.width() / 2) {
-            $(this).addClass('magnified');
-          } else {
-            $(this).removeClass('magnified');
-          }
         });
-
-        // Update the magnifying glass background position for the transition effect
-        magnifyingGlass.css('background-position', (mouseX - magnifyingGlass.width() / 2) + 'px ' + (mouseY - magnifyingGlass.height() / 2) + 'px');
-      });
-    });
   </script>
 </body>
 </html>
